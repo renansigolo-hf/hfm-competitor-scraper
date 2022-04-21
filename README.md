@@ -2,7 +2,7 @@
 
 A simple script to scrape data from our competitor's website.
 
-## Pre-requisetes
+## Pre-requisites
 
 - Make sure you have [Node.js v16](https://nodejs.org/en/) or higher installed.
 - Install the dependencies by running `npm install`
