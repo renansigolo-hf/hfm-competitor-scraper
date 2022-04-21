@@ -1,0 +1,16 @@
+{
+  "name": "hfm-competitor-scraper",
+  "version": "1.0.0",
+  "description": "A simple script to scrape data from our competitor's website",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf node_modules package-lock.json",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.2.3",
+    "objects-to-csv": "^1.3.6",
+    "puppeteer": "^13.6.0"
+  }
+}
