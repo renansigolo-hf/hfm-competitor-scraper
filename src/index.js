@@ -155,9 +155,6 @@ async function searchHarrisFarm(userInput) {
 
   // Navigate to the search page
   await page.goto(searchMarket(2, userInput), { waitUntil: "networkidle0" });
-  // await page.waitForSelector(".product-item", {
-  //   visible: true,
-  // });
 
   // Extract product fields
   const productData = await page.evaluate(() => {
