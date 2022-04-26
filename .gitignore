@@ -1,2 +1,2 @@
-out/coles-data-*.csv
+out/*
 node_modules
