@@ -21,7 +21,6 @@ const markets = [
 
 // Configure Puppeteer
 const puppeteerOptions = {
-  headless: false,
   args: [`--window-size=1920,1080`],
   defaultViewport: {
     width: 1920,
@@ -32,7 +31,6 @@ const puppeteerOptions = {
 // Declare variables
 const userInput = process.argv[2] || "";
 const userValues = userInput.split(",");
-// const products = [];
 const productsColes = [];
 const productsWoolworths = [];
 const currentDate = new Intl.DateTimeFormat("en-AU", {
@@ -97,8 +95,15 @@ async function searchColes(userInput) {
   await browser.close();
 }
 
-const searchWoolworths = async (userInput) => {
-  const browser = await puppeteer.launch(puppeteerOptions);
+/**
+ * Search for one product in a specific vendor
+ * @param {string} userInput The value used in the search
+ */
+async function searchWoolworths(userInput) {
+  const browser = await puppeteer.launch({
+    ...puppeteerOptions,
+    headless: false,
+  });
   const page = await browser.newPage();
 
   await page.goto(searchMarket(1, userInput));
@@ -113,7 +118,7 @@ const searchWoolworths = async (userInput) => {
       if (!selectors || !document.querySelector(selectors)) return "";
       return document.querySelector(selectors).innerHTML;
     };
-    // const productTile = document.querySelector("shared-product-tile");
+
     return {
       brand: "",
       name: querySelect(".shelfProductTile-descriptionLink"),
@@ -132,7 +137,7 @@ const searchWoolworths = async (userInput) => {
   await browser.close();
 
   return productsWoolworths;
-};
+}
 
 /** Generate a CSV file */
 async function generateCsv() {
@@ -147,27 +152,6 @@ await searchProducts();
 await generateCsv();
 spinner.success({ text: `File successfully generated at ${filePath}` });
 
+// Log results
 console.table(productsColes);
 console.table(productsWoolworths);
-
-// const products = Array.from(headers).map((v) => v.innerHTML);
-
-// const data = await page.evaluate(() => {
-//   const productTile = document.querySelectorAll("shared-product-tile");
-//   const productData = [];
-//   productTile.forEach((product) => {
-//     productData.push({});
-//   });
-
-//   // const headers = document.querySelectorAll("shared-product-tile header a");
-//   // const pricesDollar = document.querySelectorAll(
-//   //   "shared-price .price-dollars"
-//   // );
-//   // const pricesCents = document.querySelectorAll("shared-price .price-cents");
-
-//   // const urls = Array.from(headers).map((v) => v.innerHTML);
-//   // const pricesText = Array.from(pricesDollar).map((v) => v.innerHTML);
-//   // const pricesCentsText = Array.from(pricesCents).map((v) => v.innerHTML);
-
-//   return productData;
-// });
