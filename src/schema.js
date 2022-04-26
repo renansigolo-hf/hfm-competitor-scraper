@@ -41,8 +41,15 @@ export class ProductHarrisFarm {
   constructor(userInput, productData) {
     this.market = "Harris Farm";
     this.searchValue = userInput;
-    this.brand = productData.brand;
-    this.name = productData.name;
-    this.price = `${productData.priceDollar}.${productData.priceCent}`;
+    this.brand = productData.brand || "Not Available";
+    this.name = productData.name.trim();
+    this.price = productData.price.replace("$", "").trim();
+    this.quantity = productData.quantity;
+    this.packagePrice = productData.package.includes("per")
+      ? productData.package.split("per")[0].replace("$", "").trim()
+      : productData.package.split(" ")[0].replace("$", "").trim();
+    this.packageUnit = productData.package.includes("per")
+      ? productData.package.split("per")[1].trim()
+      : productData.package.split(" ")[1].trim();
   }
 }

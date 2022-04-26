@@ -1,7 +1,11 @@
 import { createSpinner } from "nanospinner";
 import ObjectsToCsv from "objects-to-csv";
 import puppeteer from "puppeteer";
-import { ProductColes, ProductWoolworths } from "./schema.js";
+import {
+  ProductColes,
+  ProductHarrisFarm,
+  ProductWoolworths,
+} from "./schema.js";
 
 // Declare constant variables
 const markets = [
@@ -33,6 +37,7 @@ const userInput = process.argv[2] || "";
 const userValues = userInput.split(",");
 const productsColes = [];
 const productsWoolworths = [];
+const productsHarrisFarm = [];
 const currentDate = new Intl.DateTimeFormat("en-AU", {
   day: "2-digit",
   month: "numeric",
@@ -51,7 +56,8 @@ async function searchProducts() {
     const searchValue = userValue.trim();
     const coles = await searchColes(searchValue);
     const woolworths = await searchWoolworths(searchValue);
-    return Promise.all([coles, woolworths]);
+    const harrisFarm = await searchHarrisFarm(searchValue);
+    return Promise.all([coles, woolworths, harrisFarm]);
   });
   await Promise.all(searching);
 }
@@ -139,9 +145,48 @@ async function searchWoolworths(userInput) {
   return productsWoolworths;
 }
 
+/**
+ * Search for one product in a specific vendor
+ * @param {string} userInput The value used in the search
+ */
+async function searchHarrisFarm(userInput) {
+  const browser = await puppeteer.launch(puppeteerOptions);
+  const page = await browser.newPage();
+
+  // Navigate to the search page
+  await page.goto(searchMarket(2, userInput), { waitUntil: "networkidle0" });
+
+  // Extract product fields
+  const productData = await page.evaluate(() => {
+    const querySelect = (selectors) => {
+      if (!selectors || !document.querySelector(selectors))
+        return "Not Available";
+      return document.querySelector(selectors).innerHTML;
+    };
+
+    return {
+      brand: "",
+      name: querySelect(".product-item .title a"),
+      price: querySelect(".product-item .unit_price span"),
+      quantity: querySelect(".product-item .unit_price small"),
+      package: querySelect(".product-item .compare_at_price small"),
+    };
+  });
+
+  // Transform data
+  const transformedProductData = new ProductHarrisFarm(userInput, productData);
+  productsHarrisFarm.push(transformedProductData);
+
+  await browser.close();
+}
+
 /** Generate a CSV file */
 async function generateCsv() {
-  const products = [...productsColes, ...productsWoolworths];
+  const products = [
+    ...productsColes,
+    ...productsWoolworths,
+    ...productsHarrisFarm,
+  ];
   const csv = new ObjectsToCsv(products);
   await csv.toDisk(filePath);
 }
@@ -155,3 +200,4 @@ spinner.success({ text: `File successfully generated at ${filePath}` });
 // Log results
 console.table(productsColes);
 console.table(productsWoolworths);
+console.table(productsHarrisFarm);
