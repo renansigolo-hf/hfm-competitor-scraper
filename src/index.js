@@ -1,3 +1,4 @@
+import { createSpinner } from "nanospinner";
 import ObjectsToCsv from "objects-to-csv";
 import puppeteer from "puppeteer";
 
@@ -75,7 +76,8 @@ async function generateCsv() {
 }
 
 // Run all functions
-console.info(`⏳ Searching values, please wait...\n`);
+const spinner = createSpinner("Searching values, please wait...").start();
 await searchProducts();
 await generateCsv();
-console.info(`✅ File successfully generated at ${filePath}\n`);
+spinner.success({ text: `File successfully generated at ${filePath}` });
+console.table(productsColes);
