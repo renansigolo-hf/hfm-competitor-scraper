@@ -9,5 +9,6 @@ A simple script to scrape data from our competitor's website.
 
 ## Usage
 
-- Run the script by running `npm start "value 1, value 2, value 3"`. Make sure to replace the values in the quotes with the values you want to scrape in a comma-separated values (CSV) format.
-- If all goes well, a new file should be creates at `out/coles-data-DD-MM-YYYY.csv` with all the data.
+1. Run the script by running `npm start`.
+1. Paste or type the values that you want to scrape in a comma-separated values (CSV) format. E.g. `Banana, Potato, Cream Cheese, Milk, Soy-Sauce`
+1. The script will output the data in a CSV format in `out/coles-data-DD-MM-YYYY.csv` with all the scrapped data.
