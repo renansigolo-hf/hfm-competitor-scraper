@@ -1,3 +1,4 @@
+import inquirer from "inquirer";
 import { createSpinner } from "nanospinner";
 import ObjectsToCsv from "objects-to-csv";
 import puppeteer from "puppeteer";
@@ -27,31 +28,40 @@ const markets = [
 const puppeteerOptions = {
   args: [`--window-size=1440,789`],
   defaultViewport: {
-    width: 1024,
+    width: 1440,
     height: 789,
   },
 };
 
 // Declare variables
-const userInput = process.argv[2] || "";
-const userValues = userInput.split(",");
 const productsColes = [];
 const productsWoolworths = [];
 const productsHarrisFarm = [];
-const currentDate = new Intl.DateTimeFormat("en-AU", {
-  day: "2-digit",
-  month: "numeric",
-  year: "numeric",
-})
+const currentDate = new Intl.DateTimeFormat("en-AU")
   .format(Date.now())
   .replaceAll("/", "-");
-const filePath = `out/products-data-${currentDate}.csv`;
+const filePathOutput = `out/products-data-${currentDate}.csv`;
 
 const searchMarket = (market, product) =>
   `${markets[market].url}${encodeURI(product)}`;
 
+/** Asks for an input of the user */
+async function askProductsInput() {
+  const answers = await inquirer.prompt({
+    name: "productsInput",
+    type: "input",
+    message:
+      "Paste or type the products you want to search for in a CSV format:",
+    validate: (input) => {
+      return input.length === 0 ? "Please enter at least one product" : true;
+    },
+  });
+
+  return answers.productsInput.split(",");
+}
+
 /** Triggers a search for multiple products */
-async function searchProducts() {
+async function searchProducts(userValues) {
   const searching = userValues.map(async (userValue) => {
     const searchValue = userValue.trim();
     const coles = await searchColes(searchValue);
@@ -181,14 +191,15 @@ async function generateCsv() {
     ...productsHarrisFarm,
   ];
   const csv = new ObjectsToCsv(products);
-  await csv.toDisk(filePath);
+  await csv.toDisk(filePathOutput);
 }
 
 // Run all functions
+const userValues = await askProductsInput();
 const spinner = createSpinner("Searching markets, please wait...").start();
-await searchProducts();
+await searchProducts(userValues);
 await generateCsv();
-spinner.success({ text: `File successfully generated at ${filePath}` });
+spinner.success({ text: `File successfully generated at ${filePathOutput}` });
 
 // Log results
 console.table(productsColes);
