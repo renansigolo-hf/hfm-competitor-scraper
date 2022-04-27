@@ -2,11 +2,7 @@ import inquirer from "inquirer";
 import { createSpinner } from "nanospinner";
 import ObjectsToCsv from "objects-to-csv";
 import puppeteer from "puppeteer";
-import {
-  ProductColes,
-  ProductHarrisFarm,
-  ProductWoolworths,
-} from "./schema.js";
+import { ProductHarrisFarm, ProductWoolworths } from "./schema.js";
 
 // Declare constant variables
 const markets = [
@@ -37,9 +33,15 @@ const puppeteerOptions = {
 const productsColes = [];
 const productsWoolworths = [];
 const productsHarrisFarm = [];
-const currentDate = new Intl.DateTimeFormat("en-AU")
+const currentDate = new Intl.DateTimeFormat("en-AU", {
+  dateStyle: "short",
+  timeStyle: "short",
+})
   .format(Date.now())
-  .replaceAll("/", "-");
+  .replaceAll(", ", "_")
+  .replaceAll("/", "-")
+  .replaceAll(":", "-")
+  .replaceAll(" ", "-");
 const filePathOutput = `out/products-data-${currentDate}.csv`;
 
 const searchMarket = (market, product) =>
@@ -67,7 +69,8 @@ async function searchProducts(userValues) {
     const coles = await searchColes(searchValue);
     const woolworths = await searchWoolworths(searchValue);
     const harrisFarm = await searchHarrisFarm(searchValue);
-    return Promise.all([coles, woolworths, harrisFarm]);
+    return [coles, woolworths, harrisFarm];
+    // return Promise.all([coles, woolworths, harrisFarm]);
   });
   await Promise.all(searching);
 }
@@ -81,29 +84,52 @@ async function searchColes(userInput) {
   const page = await browser.newPage();
 
   // Navigate to the search page
-  await page.goto(searchMarket(0, userInput), { waitUntil: "networkidle0" });
+  await page.goto(searchMarket(0, userInput), { waitUntil: "networkidle2" });
 
   // Extract product fields
   const productData = await page.evaluate(() => {
-    const querySelect = (selectors) => {
-      if (!selectors || !document.querySelector(selectors))
-        return "Not Available";
-      return document.querySelector(selectors).innerHTML;
-    };
+    // const querySelect = (selectors) => {
+    //   if (!selectors || !document.querySelectorAll(selectors))
+    //     return "Not Available";
+    //   return document.querySelectorAll(selectors);
+    // };
 
-    return {
-      brand: querySelect(".product-brand"),
-      name: querySelect(".product-name"),
-      priceDollar: querySelect(".price-container .dollar-value"),
-      priceCent: querySelect(".price-container .cent-value"),
-      quantity: querySelect(".product-info .package-size"),
-      package: querySelect(".product-info .package-price"),
-    };
+    // return {
+    //   brand: querySelect(".product-brand"),
+    //   name: querySelect(".product-name"),
+    //   priceDollar: querySelect(".price-container .dollar-value"),
+    //   priceCent: querySelect(".price-container .cent-value"),
+    //   quantity: querySelect(".product-info .package-size"),
+    //   package: querySelect(".product-info .package-price"),
+    // };
+    const products = document.querySelectorAll(".product-header");
+    // products.forEach((product) => {
+    //   product.querySelector(".product-brand").innerHTML;
+    // });
+    return Array.from(products).map((product) => {
+      return {
+        brand: product.querySelector(".product-brand").innerHTML,
+        name: product.querySelector(".product-name").innerHTML,
+        priceDollar: product.querySelector(".price-container .dollar-value")
+          .innerHTML,
+        priceCent: product.querySelector(".price-container .cent-value")
+          .innerHTML,
+        quantity: product.querySelector(".product-info .package-size")
+          .innerHTML,
+        package: product.querySelector(".product-info .package-price")
+          .innerHTML,
+      };
+    });
+    // const urls = Array.from(products).map((v) => v.src);
   });
+  console.log(
+    "🚀 ~ file: index.js ~ line 110 ~ productData ~ productData",
+    productData
+  );
 
   // Transform data
-  const transformedProductData = new ProductColes(userInput, productData);
-  productsColes.push(transformedProductData);
+  // const transformedProductData = new ProductColes(userInput, productData);
+  // productsColes.push(transformedProductData);
 
   await browser.close();
 }
