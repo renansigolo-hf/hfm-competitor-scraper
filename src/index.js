@@ -25,10 +25,10 @@ const markets = [
 
 // Configure Puppeteer
 const puppeteerOptions = {
-  args: [`--window-size=1920,1080`],
+  args: [`--window-size=1440,789`],
   defaultViewport: {
-    width: 1920,
-    height: 1080,
+    width: 1024,
+    height: 789,
   },
 };
 
@@ -71,10 +71,7 @@ async function searchColes(userInput) {
   const page = await browser.newPage();
 
   // Navigate to the search page
-  await page.goto(searchMarket(0, userInput));
-  await page.waitForSelector("header.product-header", {
-    visible: true,
-  });
+  await page.goto(searchMarket(0, userInput), { waitUntil: "networkidle0" });
 
   // Extract product fields
   const productData = await page.evaluate(() => {
@@ -112,11 +109,7 @@ async function searchWoolworths(userInput) {
   });
   const page = await browser.newPage();
 
-  await page.goto(searchMarket(1, userInput));
-
-  await page.waitForSelector("shared-product-tile", {
-    visible: true,
-  });
+  await page.goto(searchMarket(1, userInput), { waitUntil: "networkidle0" });
 
   // Execute code in the DOM
   const productData = await page.evaluate(() => {

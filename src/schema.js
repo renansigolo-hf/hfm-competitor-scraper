@@ -9,11 +9,12 @@ export class ProductColes {
       .toLowerCase()
       .replace("approx.", "")
       .trim();
-    this.packagePrice = productData.package
-      .split("per")[0]
-      .replace("$", "")
-      .trim();
-    this.packageUnit = productData.package.split("per")[1].trim();
+    this.packagePrice = productData.package.includes("per")
+      ? productData?.package.split("per")[0].replace("$", "").trim()
+      : "Not Available";
+    this.packageUnit = productData.package.includes("per")
+      ? productData?.package.split("per")[1].trim()
+      : "Not Available";
   }
 }
 
