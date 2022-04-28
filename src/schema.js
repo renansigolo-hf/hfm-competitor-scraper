@@ -15,6 +15,7 @@ export class ProductColes {
     this.packageUnit = productData.package.includes("per")
       ? productData?.package.split("per")[1].trim()
       : "Not Available";
+    this.url = productData.url;
   }
 }
 
@@ -35,6 +36,7 @@ export class ProductWoolworths {
     this.packageUnit = productData.package
       ? productData.package.split("/")[1].trim()
       : "Not Available";
+    this.url = productData.url;
   }
 }
 
@@ -52,5 +54,6 @@ export class ProductHarrisFarm {
     this.packageUnit = productData.package.includes("per")
       ? productData.package.split("per")[1].trim()
       : productData.package.split(" ")[1].trim();
+    this.url = productData.url;
   }
 }

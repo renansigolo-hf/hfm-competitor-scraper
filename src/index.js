@@ -105,6 +105,7 @@ async function searchColes(userInput) {
       priceCent: querySelect(".price-container .cent-value"),
       quantity: querySelect(".product-info .package-size"),
       package: querySelect(".product-info .package-price"),
+      url: document.querySelector(".product-title a").href,
     };
   });
 
@@ -144,6 +145,7 @@ async function searchWoolworths(userInput) {
       package: querySelect(
         ".shelfProductTile-information .shelfProductTile-cupPrice"
       ),
+      url: document.querySelector(".shelfProductTile-descriptionLink").href,
     };
   });
 
@@ -180,6 +182,7 @@ async function searchHarrisFarm(userInput) {
       price: querySelect(".product-item .unit_price span"),
       quantity: querySelect(".product-item .unit_price small"),
       package: querySelect(".product-item .compare_at_price small"),
+      url: document.querySelector(".product-item .title a").href,
     };
   });
 
