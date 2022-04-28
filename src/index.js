@@ -37,9 +37,16 @@ const puppeteerOptions = {
 const productsColes = [];
 const productsWoolworths = [];
 const productsHarrisFarm = [];
-const currentDate = new Intl.DateTimeFormat("en-AU")
+const currentDate = new Intl.DateTimeFormat("en-AU", {
+  dateStyle: "short",
+  timeStyle: "short",
+})
   .format(Date.now())
-  .replaceAll("/", "-");
+  .replaceAll("/", "-")
+  .replaceAll(", ", "_")
+  .replaceAll("/", "-")
+  .replaceAll(":", "-")
+  .replaceAll(" ", "-");
 const filePathOutput = `out/products-data-${currentDate}.csv`;
 
 const searchMarket = (market, product) =>
